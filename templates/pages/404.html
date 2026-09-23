@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="text-align:center; padding:80px 20px;">
+    <h1 style="font-size:70px; color:var(--brand-dark);">404</h1>
+    <p style="color:#777; margin-bottom:20px;">Oops, this page doesn't exist.</p>
+    <a href="{% url 'shop:home' %}" style="background:var(--brand-dark); color:#fff; padding:10px 24px; border-radius:20px; text-decoration:none;">Go Home</a>
+</div>
+{% endblock %}

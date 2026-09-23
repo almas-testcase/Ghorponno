@@ -1,0 +1,37 @@
+<div class="review-card">
+    <div class="review-quote-icon">❝</div>
+
+    {% if r.images.all %}
+        {% with img_count=r.images.all|length %}
+        <div class="review-img-slider{% if img_count > 1 %} multi{% endif %}">
+            <div class="review-img-track">
+                {% for img in r.images.all %}
+                    <div class="review-img-slide"><img src="{{ img.image.url }}" alt="{{ r.name }}"></div>
+                {% endfor %}
+            </div>
+            {% if img_count > 1 %}
+                <div class="review-img-dots"></div>
+            {% endif %}
+        </div>
+        {% endwith %}
+    {% else %}
+        <div class="review-stars">
+            {% for i in "12345" %}
+                {% if forloop.counter <= r.rating %}
+                    <span class="filled">★</span>
+                {% else %}
+                    <span>☆</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <p class="review-comment">{{ r.comment }}</p>
+    {% endif %}
+
+    <div class="review-footer">
+        <div class="review-avatar">{{ r.name|first|upper }}</div>
+        <div class="review-meta">
+            <div class="review-name">{{ r.name }}</div>
+            <div class="review-date">{{ r.created_at|date:"d M, Y" }}</div>
+        </div>
+    </div>
+</div>

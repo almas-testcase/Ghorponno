@@ -1,0 +1,65 @@
+{% load static %}
+<footer class="site-footer">
+    <div class="footer-top">
+
+        <div class="footer-col footer-brand">
+
+        {% comment %} <h3>🌿Ghorponyo</h3> {% endcomment %}
+
+        <a href="{% url 'shop:home' %}" class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="Ghorponyo" class="logo-img">
+        </a>
+        <p>Dedicated to delivering quality, authentic & reliable products straight to your household.</p>
+      
+        <div class="footer-social">
+                <a href="https://www.facebook.com/profile.php?id=61594813464205" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://www.instagram.com/ghorponyo" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="mailto:shop.ghorponyo@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4>Explore Products</h4>
+            <ul>
+                {% for cat in nav_categories %}
+                    {% if cat.show_in_footer %}
+                        <li><a href="{% url 'shop:category_detail' cat.slug %}">{{ cat.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Other Links</h4>
+            <ul>
+                <li><a href="{% url 'pages:our_mission' %}">Our Mission</a></li>
+                <li><a href="{% url 'pages:contact_us' %}">Contact Us</a></li>
+                <li><a href="{% url 'shop:track_order' %}">Track Order</a></li>
+                <li><a href="{% url 'pages:faq' %}">Frequently Asked Questions</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Policies</h4>
+            <ul>
+                <li><a href="{% url 'pages:refund_policy' %}">Refund Policy</a></li>
+                <li><a href="{% url 'pages:exchange_policy' %}">Exchange Policy</a></li>
+                <li><a href="{% url 'pages:privacy_policy' %}">Privacy Policy</a></li>
+                <li><a href="{% url 'pages:terms_conditions' %}">Terms & Conditions</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <ul>
+                <li>📞 <a href="tel:+8801852677251">01852677251</a></li>
+                <li>📍 Beraid, Badda, Dhaka - 1212, Bangladesh. </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} Ghorponyo. All rights reserved.</p>
+    </div>
+</footer>

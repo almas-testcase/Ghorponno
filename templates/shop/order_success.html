@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="print-area" style="max-width:600px; margin:60px auto; text-align:center; padding:30px; background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(63,114,175,0.10);">
+
+    <h1 style="color:var(--brand-dark);">✅ Order Placed Successfully!</h1>
+
+    <p style="margin:15px 0;">
+        Thank you, <strong>{{ order.full_name }}</strong>. Your order has been received.
+    </p>
+
+    <div style="background:linear-gradient(135deg, #f5fcf8, #f5f9fd); padding:15px; border-radius:8px; margin:20px 0; text-align:left; border:1px solid #e6ede6;">
+
+        <p>Order ID: <strong>{{ order.order_id }}</strong></p>
+        <p>Phone: <strong>{{ order.phone }}</strong></p>
+        <p>Address: <strong>{{ order.address }}</strong></p>
+
+        <hr style="margin:10px 0; border:none; border-top:1px dashed #b8d4f0;">
+
+        {% for item in order.items.all %}
+            <p>{{ item.product.name }} × {{ item.quantity }} — ৳{{ item.price }}</p>
+        {% endfor %}
+
+        <hr style="margin:10px 0; border:none; border-top:1px dashed #b8d4f0;">
+
+        <p>Subtotal: ৳{{ order.subtotal }}</p>
+        <p>Delivery ({{ order.get_delivery_area_display }}): ৳{{ order.delivery_charge }}</p>
+
+        {% if order.discount_amount > 0 %}
+            <p style="color:var(--brand-blue);">
+                Promo ({{ order.promo_code }}): − ৳{{ order.discount_amount }}
+            </p>
+        {% endif %}
+
+        <p>
+            Total Amount:
+            <strong style="color:var(--brand-dark);">৳{{ order.total_amount }}</strong>
+        </p>
+
+        <p>
+            Status:
+            <strong style="color:var(--brand-blue);">{{ order.get_status_display }}</strong>
+        </p>
+    </div>
+
+    <p style="color:#666; font-size:14px;">
+        Please save your Order ID to track your order later.
+    </p>
+
+    <div class="no-print" style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+
+        <button onclick="window.print()" style="background:var(--brand-dark); color:#fff; padding:10px 20px; border:none; border-radius:20px; cursor:pointer;">
+            🖨️ Print Order
+        </button>
+
+        <a href="{% url 'shop:home' %}" style="background:var(--brand-light-blue); color:var(--brand-dark); padding:10px 25px; border-radius:20px; text-decoration:none; font-weight:600;">
+            Continue Shopping
+        </a>
+
+    </div>
+</div>
+
+<script>
+fbq('track', 'Purchase', {
+    value: {{ order.total_amount }},
+    currency: 'BDT',
+    content_ids: [{% for item in order.items.all %}'{{ item.product.id }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+    content_type: 'product',
+    num_items: {{ order.items.count }}
+}, {eventID: 'order_{{ order.id }}'});
+</script>
+
+{% endblock %}

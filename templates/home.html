@@ -1,0 +1,587 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+
+/* ===== Category-wise Product Section ===== */
+.category-section { margin-top: 30px; }
+.category-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1260px;
+    margin: 0 auto 14px;
+    padding: 0 40px 10px;
+    border-bottom: 2px solid #eef0ee;
+}
+
+.category-section-header h3 { font-size: 20px; color: var(--brand-dark); font-weight: 700; }
+.category-section-header .view-all-link {
+    color: var(--brand-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+.category-section .grid { padding-top: 10px; }
+.category-section-header .view-all-link:hover { text-decoration: underline; }
+
+/* ===== Category + Side Ads Row ===== */
+.category-with-ads {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.side-ad {
+    flex: 0 0 190px;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eef0ee;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: adFadeIn 0.6s ease forwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.side-ad:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+}
+.side-ad-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    z-index: 2;
+}
+.side-ad-img-box {
+    width: 100%;
+    aspect-ratio: 1 / 2;
+    overflow: hidden;
+}
+.side-ad img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+.side-ad:hover img {
+    transform: scale(1.06);
+}
+.side-ad.right { animation-delay: 0.15s; }
+@keyframes adFadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.category-center { flex: 1; min-width: 0; }
+
+@media (max-width: 1050px) {
+    .category-with-ads { flex-wrap: wrap; }
+    .side-ad { flex: 1 1 45%; order: 2; }
+    .category-center { order: 1; flex: 1 1 100%; }
+}
+@media (max-width: 600px) {
+    .side-ad { display: none; }
+}
+
+
+
+/* =========================================
+   PRODUCT CARD CART ACTIONS
+   ========================================= */
+
+.cart-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Add To Cart */
+.cart-action .add-to-cart-btn {
+    flex: 1;
+    width: auto;
+    height: 34px;        
+    padding: 0 6px;      
+    border: 1px solid var(--brand-dark);
+    border-radius: 7px;
+    background: #fff;
+    color: var(--brand-dark);
+    font-size: 12px;     
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+}
+
+/* Buy Now */
+.cart-action .buy-now-form {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-action .buy-now-btn {
+    width: 100%;
+    height: 34px;      
+    padding: 0 6px;        
+    border: 1px solid var(--brand-dark);
+    border-radius: 7px;
+    background: var(--brand-dark);
+    color: #fff;
+    font-size: 12px;       
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+}
+
+/* Hover */
+.cart-action .add-to-cart-btn:hover {
+    background: var(--brand-dark);
+    color: #fff;
+}
+
+.cart-action .buy-now-btn:hover {
+    background: var(--brand-dark-hover);
+    border-color: var(--brand-dark-hover);
+}
+
+/* Quantity */
+.cart-action .qty-stepper {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.cart-action .qty-stepper button {
+    width: 26px;
+    height: 100%;
+    flex-shrink: 0;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.cart-action .qty-label {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.cart-action .qty-stepper {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.cart-action .qty-stepper button {
+    width: 28px;
+    height: 100%;
+    flex-shrink: 0;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.cart-action .qty-label {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+
+.combo-offer-strip {
+    max-width: 1260px;
+    margin: 14px auto 0;
+    padding: 0 40px;
+    display: none; 
+}
+.combo-offer-strip a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+.combo-offer-strip a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(255, 107, 107, 0.35);
+}
+@media (max-width: 600px) {
+    .combo-offer-strip { padding: 0 16px; margin-top: 10px; }
+    .combo-offer-strip a { font-size: 12px; padding: 9px 12px; gap: 6px; white-space: normal; text-align: center; }
+}
+
+@media (max-width: 768px) {
+    .combo-offer-strip {
+        display: block;
+        max-width: 1260px;
+        margin: 14px auto 0;
+        padding: 0 16px;
+    }
+    .combo-offer-strip a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 10px 14px;
+        border-radius: 30px;
+        box-shadow: 0 6px 16px rgba(255, 107, 107, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        white-space: normal;
+        text-align: center;
+    }
+    .combo-offer-strip a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(255, 107, 107, 0.35);
+    }
+}
+</style>
+
+
+    <div class="banner-wrap">
+        <img src="{% static 'images/media.jpeg' %}" alt="Ghorponyo" class="banner-img">
+    </div>
+
+    <div class="combo-offer-strip">
+        <a href="{% url 'shop:combo_offers' %}">
+            <i class="fa-solid fa-gift"></i> এখনই দেখুন আমাদের স্পেশাল কম্বো অফার <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    {% if flash_sale_products %}
+    <div class="flash-sale-section">
+        <div class="flash-sale-header">
+            <h2>⚡ Flash Sale</h2>
+            {% if flash_sale_end %}
+            <div class="flash-countdown" id="flashCountdown" data-end="{{ flash_sale_end|date:'c' }}">
+                <span id="fc-h">00</span>:<span id="fc-m">00</span>:<span id="fc-s">00</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="grid">
+            {% for product in flash_sale_products %}
+                {% include 'shop/includes/product_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <h2 style="text-align:center; margin:12px 0 2px; color:var(--brand-dark); font-weight:700;">Categories</h2>
+    <div class="category-with-ads">
+        {% if ads.0 %}
+            {% if ads.0.link %}
+                <a href="{{ ads.0.link }}" target="_blank" rel="noopener" class="side-ad left">
+                    <span class="side-ad-label">Sponsored</span>
+                    <div class="side-ad-img-box"><img src="{{ ads.0.image.url }}" alt="{{ ads.0.title }}"></div>
+                </a>
+            {% else %}
+                <div class="side-ad left">
+                    <span class="side-ad-label">Sponsored</span>
+                    <div class="side-ad-img-box"><img src="{{ ads.0.image.url }}" alt="{{ ads.0.title }}"></div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="category-center">
+            <div class="category-grid">
+                {% for category in categories %}
+                    {% comment %} {% if category.slug == "grocery-food" or category.slug == "health-beauty" or category.slug == "clothing-fashion" or category.slug == "electronics-gadgets" %} {% endcomment %}
+                    {% if category.show_on_home %}
+                       <a href="{% url 'shop:category_detail' category.slug %}" class="card">
+                            <div class="card-img-box">
+                                {% if category.image %}
+                                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                {% endif %}
+                            </div>
+                            <div class="info"><strong>{{ category.name }}</strong></div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% comment %} add-img-size :  600 × 1200px (or 500 × 1000px) {% endcomment %}
+        {% if ads.1 %}
+            {% if ads.1.link %}
+                <a href="{{ ads.1.link }}" target="_blank" rel="noopener" class="side-ad right">
+                    <span class="side-ad-label">Sponsored</span>
+                    <div class="side-ad-img-box"><img src="{{ ads.1.image.url }}" alt="{{ ads.1.title }}"></div>
+                </a>
+            {% else %}
+                <div class="side-ad right">
+                    <span class="side-ad-label">Sponsored</span>
+                    <div class="side-ad-img-box"><img src="{{ ads.1.image.url }}" alt="{{ ads.1.title }}"></div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+
+    <!-- Category-wise Product Sections -->
+    {% for entry in category_products %}
+        <div class="category-section">
+            <div class="category-section-header">
+                <h3>{{ entry.category.name }}</h3>
+                <a href="{% url 'shop:category_detail' entry.category.slug %}" class="view-all-link">View All ↗</a>
+            </div>
+            <div class="grid">
+                {% for product in entry.products %}
+                    {% include 'shop/includes/product_card.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+ 
+
+     <!-- ===== Customer Reviews ===== -->
+    <h2 style="text-align:center; color:var(--brand-dark); font-weight:700; margin-top:10px;">✦ Customer Reviews ✦</h2>
+
+    <div class="review-section">
+        <div class="review-marquee">
+            <div class="review-track" id="reviewTrack">
+                {% for r in reviews %}
+                    {% include 'shop/includes/review_card.html' with r=r %}
+                {% endfor %}
+                {% if reviews %}
+                    {% for r in reviews %}
+                        {% include 'shop/includes/review_card.html' with r=r %}
+                    {% endfor %}
+                {% else %}
+                    <div class="review-card">
+                        <p class="review-comment">No reviews yet. Be the first to leave a review!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:22px;">
+            <button id="openReviewForm" class="review-cta-btn"><i class="fa-regular fa-pen-to-square"></i> Write a Review</button>
+        </div>
+    </div>
+
+
+    <!-- Review Modal -->
+    <div class="review-modal" id="reviewModal">
+        <div class="review-modal-box">
+            <span class="review-modal-close" id="closeReviewModal">&times;</span>
+            <h3>Share Your Experience</h3>
+            <form id="reviewForm">
+                <input type="text" name="name" placeholder="Your name" required>
+                <select name="rating">
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★☆</option>
+                    <option value="3">★★★☆☆</option>
+                    <option value="2">★★☆☆☆</option>
+                    <option value="1">★☆☆☆☆</option>
+                </select>
+                <textarea name="comment" placeholder="Write your feedback..." required></textarea>
+                <button type="submit" class="add-to-cart-btn">Submit</button>
+                <p id="reviewMsg"></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // ---- Review Marquee (continuous, seamless + draggable) ----
+        const track = document.getElementById('reviewTrack');
+        const marquee = document.querySelector('.review-marquee');
+        if (track && marquee && track.children.length > 1) {
+            const pxPerSecond = 40;
+            const singleSetWidth = track.scrollWidth / 2;
+            const duration = singleSetWidth / pxPerSecond;
+            track.style.animationDuration = `${duration}s`;
+
+            function currentTranslateX() {
+                const m = getComputedStyle(track).transform;
+                if (m === 'none') return 0;
+                return new DOMMatrixReadOnly(m).m41;
+            }
+
+            let dragStartX = 0;
+            let baseX = 0;
+            let dragging = false;
+
+            marquee.addEventListener('pointerdown', (e) => {
+                dragging = true;
+                baseX = currentTranslateX();
+                dragStartX = e.clientX;
+                track.style.animation = 'none';           // hand control to JS
+                track.style.transform = `translateX(${baseX}px)`;
+                marquee.classList.add('dragging');
+                marquee.setPointerCapture(e.pointerId);
+            });
+
+            marquee.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - dragStartX;
+                track.style.transform = `translateX(${baseX + dx}px)`;
+            });
+
+            function endDrag(e) {
+                if (!dragging) return;
+                dragging = false;
+                marquee.classList.remove('dragging');
+
+                let finalX = baseX + (e.clientX - dragStartX);
+
+                // wrap seamlessly within the duplicated track width
+                finalX = finalX % singleSetWidth;
+                if (finalX > 0) finalX -= singleSetWidth;
+
+                // resume the CSS animation, continuing from this exact position
+                const progress = (-finalX / singleSetWidth);
+                track.style.transform = '';
+                track.style.animation = 'none';
+                void track.offsetWidth; // force reflow so the restart takes effect
+                track.style.animation = `reviewScroll ${duration}s linear infinite`;
+                track.style.animationDelay = `-${progress * duration}s`;
+            }
+
+            marquee.addEventListener('pointerup', endDrag);
+            marquee.addEventListener('pointerleave', (e) => { if (dragging) endDrag(e); });
+        }
+
+        // ---- Review Modal ----
+        const modal = document.getElementById('reviewModal');
+        document.getElementById('openReviewForm')?.addEventListener('click', () => modal.classList.add('open'));
+        document.getElementById('closeReviewModal')?.addEventListener('click', () => modal.classList.remove('open'));
+        modal?.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+        // ---- Review Submit (AJAX, uses getCookie from script.js) ----
+        document.getElementById('reviewForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const msgEl = document.getElementById('reviewMsg');
+            fetch("{% url 'pages:submit_review' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: new FormData(form),
+            })
+            .then(res => res.json())
+            .then(data => {
+                msgEl.textContent = data.message;
+                msgEl.style.color = data.success ? 'var(--brand-dark)' : 'var(--brand-danger)';
+                if (data.success) form.reset();
+            });
+        });
+
+        // ---- Flash Sale Countdown ----
+        const cd = document.getElementById('flashCountdown');
+        if (cd) {
+            const end = new Date(cd.dataset.end).getTime();
+            const fcH = document.getElementById('fc-h');
+            const fcM = document.getElementById('fc-m');
+            const fcS = document.getElementById('fc-s');
+            const timer = setInterval(() => {
+                const diff = Math.max(0, end - Date.now());
+                fcH.textContent = String(Math.floor(diff / 3600000)).padStart(2, '0');
+                fcM.textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+                fcS.textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+                if (diff <= 0) { clearInterval(timer); location.reload(); }
+            }, 1000);
+        }
+    });
+
+
+        // ---- Review image sliders (nested inside marquee cards) ----
+        document.querySelectorAll('.review-img-slider.multi').forEach(slider => {
+            const track = slider.querySelector('.review-img-track');
+            const slides = slider.querySelectorAll('.review-img-slide');
+            const dotsWrap = slider.querySelector('.review-img-dots');
+            let idx = 0;
+
+            if (slides.length <= 1) return; // nothing to slide
+
+            if (dotsWrap) {
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('span');
+                    if (i === 0) dot.classList.add('active');
+                    dotsWrap.appendChild(dot);
+                });
+            }
+            const dots = dotsWrap ? dotsWrap.querySelectorAll('span') : [];
+
+            function goTo(i) {
+                idx = (i + slides.length) % slides.length;
+                track.style.transform = `translateX(-${idx * 100}%)`;
+                dots.forEach((d, di) => d.classList.toggle('active', di === idx));
+            }
+
+            slider.querySelector('.prev')?.addEventListener('click', () => goTo(idx - 1));
+            slider.querySelector('.next')?.addEventListener('click', () => goTo(idx + 1));
+
+            // ---- Mouse/touch drag to slide left/right ----
+            let startX = 0;
+            let dragging = false;
+
+            slider.addEventListener('pointerdown', (e) => {
+                dragging = true;
+                startX = e.clientX;
+                slider.classList.add('dragging');
+                slider.setPointerCapture(e.pointerId);
+            });
+
+            slider.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - startX;
+                track.style.transform = `translateX(calc(-${idx * 100}% + ${dx}px))`;
+            });
+
+            function endDrag(e) {
+                if (!dragging) return;
+                dragging = false;
+                slider.classList.remove('dragging');
+                const dx = e.clientX - startX;
+                if (Math.abs(dx) > 40) {
+                    goTo(dx < 0 ? idx + 1 : idx - 1);
+                } else {
+                    goTo(idx); // snap back
+                }
+            }
+
+            slider.addEventListener('pointerup', endDrag);
+            slider.addEventListener('pointerleave', (e) => { if (dragging) endDrag(e); });
+        });
+        
+    </script>
+
+{% endblock %}

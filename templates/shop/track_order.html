@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+/* ======================== Track Order Page ====================== */
+.track-wrap {
+    max-width: 750px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
+}
+
+.track-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+.track-header .track-icon {
+    width: 60px; height: 60px;
+    background: var(--brand-gradient);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 14px;
+    box-shadow: 0 6px 16px rgba(28, 59, 58, 0.18);
+}
+.track-header h2 {
+    font-size: 24px;
+    color: var(--brand-dark);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+.track-header p { color: #777; font-size: 14px; }
+
+.track-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border: 1px solid #eef0ee;
+}
+.track-form input {
+    flex: 1;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    background: transparent;
+}
+.track-form input:focus { outline: none; }
+.track-form button {
+    background: var(--brand-dark);
+    color: #fff;
+    border: none;
+    padding: 0 26px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s ease, transform 0.15s ease;
+    display: flex; align-items: center; gap: 6px;
+}
+.track-form button:hover { background: var(--brand-dark-hover); transform: translateY(-1px); }
+
+.track-result-count {
+    color: var(--brand-dark);
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ===== Order Track Cards ===== */
+.order-card {
+    background: #fff;
+    border: 1px solid #eef0ee;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.order-card:hover {
+    box-shadow: 0 10px 24px rgba(28, 59, 58, 0.10);
+    transform: translateY(-2px);
+}
+.order-card-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 16px 20px;
+    background: var(--brand-light-blue);
+    border-bottom: 1px solid #eef0ee;
+    font-size: 14px; gap: 10px;
+}
+.order-card-meta { line-height: 1.6; color: var(--brand-dark); }
+.order-card-meta strong { color: var(--brand-dark); }
+.order-date { display: block; color: #4a6461; font-size: 12.5px; margin-top: 2px; }
+.order-card-body { padding: 14px 20px; }
+.order-item-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px;
+}
+.order-item-row:last-child { border-bottom: none; }
+.order-item-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; background:#f0f0f0; flex-shrink: 0; }
+.order-item-name { flex: 1; color: #333; }
+.order-item-price { white-space: nowrap; font-weight: 700; color: var(--brand-dark); }
+.order-card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 13px 20px; background: #fafcfa; border-top: 1px solid #eee; font-size: 14px;
+    gap: 10px;
+}
+.order-delivery-addr { color: #666; font-size: 13px; }
+.order-total { white-space: nowrap; color: var(--brand-dark); font-size: 15px; }
+
+/* Status Badges — semantic colors kept for clarity, softened to match brand tone */
+.status-badge {
+    font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 20px; white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+.status-pending    { background: #fff3cd; color: #8a6d00; }
+.status-processing { background: var(--brand-light-blue); color: var(--brand-blue); }
+.status-shipped    { background: #ffe5b4; color: #a15c00; }
+.status-delivered  { background: var(--brand-light-green); color: var(--brand-dark); }
+.status-cancelled  { background: #f8d7da; color: #842029; }
+
+/* Empty state */
+.track-empty {
+    text-align: center;
+    padding: 50px 20px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #eef0ee;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+}
+.track-empty .track-empty-icon { font-size: 34px; margin-bottom: 10px; }
+.track-empty-title { font-size: 16px; color: var(--brand-dark); font-weight: 600; }
+.track-empty-sub { font-size: 13px; color: #999; margin-top: 5px; }
+
+/* ---------- Track Order Responsive ---------- */
+@media (max-width: 600px) {
+    .track-wrap { margin: 25px auto 40px; padding: 0 16px; }
+    .track-header h2 { font-size: 20px; }
+    .track-form { flex-direction: column; border-radius: 16px; }
+    .track-form input { padding: 10px 14px; }
+    .track-form button { padding: 12px; border-radius: 12px; justify-content: center; }
+
+    .order-card-header { flex-direction: column; }
+    .order-card-footer { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .order-total { align-self: flex-end; }
+}
+</style>
+
+
+<div class="track-wrap">
+
+    <div class="track-header">
+        <div class="track-icon">📦</div>
+        <h2>Track Your Order</h2>
+        <p>Enter your phone number to see all your orders.</p>
+    </div>
+
+    <form method="get" class="track-form">
+        <input type="text" name="phone" value="{{ phone }}" placeholder="Enter your phone number (e.g. 01xxxxxxxxx)" required>
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Track</button>
+    </form>
+
+    {% if searched %}
+        {% if orders %}
+            <p class="track-result-count">Found {{ orders|length }} order(s) for {{ phone }}</p>
+
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div class="order-card-meta">
+                        <strong>Order ID:</strong> {{ order.order_id }}
+                        <span class="order-date">{{ order.created_at|date:"d M Y, h:i A" }}</span>
+                    </div>
+                    <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+
+                <div class="order-card-body">
+                    {% for item in order.items.all %}
+                        <div class="order-item-row">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            {% endif %}
+                            <span class="order-item-name">{{ item.product.name }} × {{ item.quantity }}</span>
+                            <span class="order-item-price">৳{{ item.price|floatformat:0 }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="order-card-footer">
+                    <span class="order-delivery-addr">📍 {{ order.address|truncatewords:8 }}</span>
+                    <strong class="order-total">Total: ৳{{ order.total_amount }}</strong>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="track-empty">
+                <div class="track-empty-icon">😕</div>
+                <p class="track-empty-title">No orders found for this phone number.</p>
+                <p class="track-empty-sub">Please check the number and try again.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

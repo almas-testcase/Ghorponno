@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load shop_extras %}
+
+{% block content %}
+<style>
+/* ===== Product Detail Page ===== */
+.product-detail-wrap {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 90px 0 40px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.product-detail-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f6fa;
+    border-radius: 10px;
+    min-height: 320px;
+    overflow: hidden;
+    position: relative;
+    cursor: zoom-in;
+}
+.pd-slider-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+}
+.pd-slide {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+}
+.pd-slide-img {
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    transition: transform 0.12s ease-out;
+    transform-origin: center center;
+    will-change: transform;
+}
+.product-detail-image.zoomed .pd-slide-img {
+    transform: scale(2.3);
+}
+.pd-slider-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+}
+.pd-slider-dots span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pd-slider-dots span.active {
+    background: var(--brand-dark);
+    width: 18px;
+    border-radius: 5px;
+}
+
+.product-detail-image-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.product-thumbnails {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.thumb-item {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    background: #f5f6fa;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+.thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.thumb-item.active {
+    border-color: var(--brand-dark);
+}
+
+.product-detail-info { flex: 1.2; }
+
+.product-category-badge {
+    display: inline-block;
+    background: var(--brand-light-blue); 
+    color: var(--brand-dark);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    margin-bottom: 12px;
+}
+.product-detail-info h2 { font-size: 24px; margin-bottom: 8px; }
+.product-weight { color: #777; font-size: 14px; margin-bottom: 10px; }
+
+.product-detail-price {
+    font-size: 26px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 15px;
+}
+.product-detail-price .old-price {
+    font-size: 16px;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-left: 10px;
+}
+.product-detail-price .discount-badge-inline {
+    background: #e53935; color: #fff; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; margin-left: 8px; vertical-align: middle;
+}
+
+.product-description { color: #555; line-height: 1.7; margin-bottom: 15px; }
+.product-stock { font-size: 14px; margin-bottom: 20px; }
+
+.product-detail-actions {
+    display: flex;
+    gap: 15px;
+    align-items: stretch;
+}
+.pd-cart-action { flex: 1; }
+.pd-add-btn, .pd-stepper { height: 46px; }
+.buy-now-btn {
+    width: 100%;
+    height: 46px;
+    background: var(--brand-dark);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+}
+.buy-now-btn:hover {
+    background: var(--brand-dark-hover);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .product-detail-wrap { flex-direction: column; padding: 20px; }
+}
+
+</style>
+
+
+<div class="product-detail-wrap">
+
+    <div class="product-detail-image-col">
+        <div class="product-detail-image" id="productSlider">
+            <div class="pd-slider-track" id="pdSliderTrack">
+                {% if product.image %}
+                    <div class="pd-slide"><img src="{{ product.image.url }}" alt="{{ product.name }}" class="pd-slide-img"></div>
+                {% endif %}
+                {% for img in product.images.all %}
+                    <div class="pd-slide"><img src="{{ img.image.url }}" alt="{{ product.name }}" class="pd-slide-img"></div>
+                {% endfor %}
+            </div>
+            {% if product.images.all %}
+            <div class="pd-slider-dots" id="pdSliderDots"></div>
+            {% endif %}
+        </div>
+
+        {% if product.images.all %}
+        <div class="product-thumbnails" id="pdThumbnails">
+            {% if product.image %}
+                <div class="thumb-item active" data-index="0">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                </div>
+            {% endif %}
+            {% for img in product.images.all %}
+                <div class="thumb-item" data-index="{{ forloop.counter }}">
+                    <img src="{{ img.image.url }}" alt="{{ product.name }}">
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div class="product-detail-info">
+        <a href="{% url 'shop:category_detail' product.category.slug %}" class="product-category-badge">
+            <b>{{ product.category.name }}</b>
+        </a>
+
+        <h2>{{ product.name }}</h2>
+
+        {% if product.weight %}
+            <p class="product-weight">Weight: {{ product.weight }}</p>
+        {% endif %}
+
+        <div class="product-detail-price">
+            ৳{{ product.final_price|floatformat:0 }}
+            {% if product.discount_price %}
+                <span class="old-price">৳{{ product.price|floatformat:0 }}</span>
+                <span class="discount-badge-inline">{{ product.discount_percent }}% OFF</span>
+            {% endif %}
+        </div>
+
+        <p class="product-description">{{ product.description }}</p>
+
+        <p class="product-stock">
+            {% if product.stock > 0 %}
+                ✅ In Stock ({{ product.stock }} available)
+            {% else %}
+                ❌ Out of Stock
+            {% endif %}
+        </p>
+
+        {% with qty=cart|cart_qty:product.id %}
+        <div class="product-detail-actions"
+             data-product-id="{{ product.id }}"
+             data-add-url="{% url 'shop:cart_add' product.id %}"
+             data-update-url="{% url 'shop:cart_update' product.id %}"
+             data-remove-url="{% url 'shop:cart_remove' product.id %}"
+             data-buy-now-url="{% url 'shop:buy_now' product.id %}">
+
+            <div class="pd-cart-action">
+                {% if qty > 0 %}
+                    <div class="qty-stepper pd-stepper">
+                        <button type="button" class="qty-minus">−</button>
+                        <span class="qty-label">{{ qty }} in Cart</span>
+                        <button type="button" class="qty-plus">+</button>
+                    </div>
+                {% else %}
+                    <button type="button" class="add-to-cart-btn pd-add-btn">+ Add to Cart</button>
+                {% endif %}
+            </div>
+
+            <form action="{% url 'shop:buy_now' product.id %}" method="post" style="flex:1;">
+                {% csrf_token %}
+                <button type="submit" class="buy-now-btn">Buy Now</button>
+            </form>
+        </div>
+        {% endwith %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sliderBox = document.getElementById('productSlider');
+    const track      = document.getElementById('pdSliderTrack');
+    const dotsWrap   = document.getElementById('pdSliderDots');
+    const thumbs     = document.querySelectorAll('#pdThumbnails .thumb-item');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.pd-slide');
+    const total  = slides.length;
+    let current  = 0;
+    let autoTimer;
+
+    if (dotsWrap) {
+        slides.forEach((_, i) => {
+            const dot = document.createElement('span');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); });
+            dotsWrap.appendChild(dot);
+        });
+    }
+    const dots = dotsWrap ? dotsWrap.querySelectorAll('span') : [];
+
+    function goTo(index) {
+        current = (index + total) % total;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        thumbs.forEach((t, i) => t.classList.toggle('active', i === current));
+    }
+
+    function startAuto() {
+        stopAuto();
+        if (total > 1) autoTimer = setInterval(() => goTo(current + 1), 3500);
+    }
+    function stopAuto() { clearInterval(autoTimer); }
+
+    thumbs.forEach(t => {
+        t.addEventListener('click', function () {
+            stopAuto();
+            goTo(parseInt(this.dataset.index, 10));
+            startAuto();
+        });
+    });
+
+    if (sliderBox) {
+        sliderBox.addEventListener('mousemove', function (e) {
+            const img = slides[current].querySelector('img');
+            if (!img) return;
+            const rect = sliderBox.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            img.style.transformOrigin = `${x}% ${y}%`;
+            sliderBox.classList.add('zoomed');
+        });
+        sliderBox.addEventListener('mouseleave', function () {
+            sliderBox.classList.remove('zoomed');
+        });
+        sliderBox.addEventListener('mouseenter', stopAuto);
+        sliderBox.addEventListener('mouseleave', startAuto);
+    }
+
+    startAuto();
+});
+</script>
+
+<script>
+fbq('track', 'ViewContent', {
+    content_name: '{{ product.name|escapejs }}',
+    content_ids: ['{{ product.id }}'],
+    content_type: 'product',
+    value: {{ product.final_price }},
+    currency: 'BDT'
+});
+</script>
+
+
+{% endblock %}       

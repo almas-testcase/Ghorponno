@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+
+/* ======================== Checkout Page ====================== */
+.checkout-wrap {
+    max-width: 1100px;
+    margin: 6px auto 40px;   /* was 30px */
+    padding: 0 40px;
+}
+.checkout-title {
+    font-size: 24px;
+    color: #222;
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #eef0ee;
+}
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;      /* was start */
+}
+.checkout-notice {
+    grid-column: 1 / -1;
+    background: var(--brand-light-blue);
+    color: var(--brand-dark);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 4px;
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+.checkout-notice p { margin: 0; }
+.checkout-notice p + p { margin-top: 4px; }
+
+.checkout-card {
+    width:100%;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.checkout-card-title {
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Order items */
+.order-items { margin-bottom: 12px; }
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f3f3f3;
+    font-size: 14px;
+    color: #333;
+}
+.order-item:last-child { border-bottom: none; }
+.oi-qty { color: #888; font-size: 13px; }
+.oi-price { font-weight: 600; white-space: nowrap; }
+
+/* Promo box */
+.promo-box { 
+    margin-bottom: 10px; 
+}
+
+.promo-input-row { display: flex; gap: 10px; }
+.promo-input-row input {
+    flex: 1;
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+.promo-input-row input:focus { outline: none; border-color: var(--brand-blue); }
+.promo-btn {
+    background: var(--brand-dark);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.promo-btn:hover { background: var(--brand-dark-hover); }
+.promo-message {
+    font-size: 12.5px;
+    margin-top: 8px;
+    color: #999;
+}
+.promo-message.applied { color: var(--brand-dark); font-weight: 600; }
+
+/* Price breakdown */
+.price-breakdown {
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+}
+.pb-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 4px 0;
+    color: #444;
+}
+.pb-row.discount-row { color: var(--brand-dark); }
+.pb-row.pb-total {
+    border-top: 2px solid #eee;
+    margin-top: 4px;
+    padding-top: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+}
+
+.checkout-form-col, .checkout-summary { 
+    display: flex; 
+    width: 100%;  
+    min-width: 0;
+}
+
+.checkout-summary { 
+    order: 2; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+/* Delivery form */
+.delivery-form { display: flex; flex-direction: column; flex: 1; }
+.delivery-form .form-group { margin-bottom: 10px; }
+.delivery-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+}
+.delivery-form input,
+.delivery-form textarea {
+    width: 100%;
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+.delivery-form input:focus,
+.delivery-form textarea:focus { outline: none; border-color: var(--brand-dark);}
+.delivery-form textarea { 
+    resize: vertical; 
+    rows: 3;
+}
+
+.place-order-btn {
+    width: 100%;
+    background: var(--brand-dark);
+    color: #fff;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s ease;
+}
+
+.place-order-btn:hover { background: var(--brand-dark-hover); }
+.delivery-form { display: flex; flex-direction: column; }
+
+
+
+.delivery-box { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+.delivery-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+.delivery-option {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; color: #333; padding: 5px 0; cursor: pointer;
+}
+.delivery-option input { accent-color: var(--brand-dark); width: 16px; height: 16px; }
+
+.required-star {
+    color: #e53935;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+
+/* ---------- Checkout Responsive ---------- */
+@media (max-width: 900px) {
+    .checkout-layout { grid-template-columns: 1fr; }
+    .checkout-layout { display: flex; flex-direction: column; }
+    .checkout-form-col { order: 1; }
+    .checkout-summary { order: 2; display: flex; flex-direction: column; }
+    .checkout-notice { order: 3; }
+    .checkout-card { height: auto; }
+}
+
+@media (max-width: 768px) {
+    .checkout-wrap { padding: 0 16px; margin: 12px auto 40px; }
+    .checkout-title { font-size: 20px; margin-bottom: 16px; }
+    .checkout-card { padding: 18px; }
+}
+
+@media (max-width: 480px) {
+    .checkout-wrap { padding: 0; margin: 0 0 30px; }
+    .checkout-title { padding: 16px 16px 12px; margin: 0; }
+    .checkout-layout { gap: 12px; }
+    .checkout-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+        padding: 18px 16px;
+        width: 100%;
+    }
+    .delivery-form, .promo-input-row, .delivery-box { width: 100%; }
+    .checkout-notice { margin: 0 16px 16px; border-radius: 10px; }
+    .delivery-form input,
+    .delivery-form textarea,
+    .promo-input-row input {
+        font-size: 16px;
+    }
+    .place-order-btn, .promo-btn { font-size: 15px; }
+}
+
+
+@media (max-width: 420px) {
+    .promo-input-row { flex-direction: column; }
+    .promo-btn { width: 100%; }
+}
+
+
+</style>
+
+
+<div class="checkout-wrap">
+    <h2 class="checkout-title">Checkout</h2>
+
+    <div class="checkout-layout">
+        
+        <!-- Left: Order Summary + Promo + Totals -->
+        <div class="checkout-summary">
+            <div class="checkout-card">
+                <h4 class="checkout-card-title">Order Summary</h4>
+                <div class="order-items">
+                    {% for item in cart %}
+                    <div class="order-item">
+                        <span class="oi-name">{{ item.product.name }} <span class="oi-qty">× {{ item.quantity }}</span></span>
+                        <span class="oi-price">৳{{ item.total_price }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="promo-box">
+                    <div class="promo-input-row">
+                        <input type="text" id="promo-input" placeholder="Enter promo code" value="{{ promo_code }}">
+                        <button type="button" id="apply-promo-btn" class="promo-btn">
+                            {% if promo_code %}Remove{% else %}Apply{% endif %}
+                        </button>
+                    </div>
+                    <p id="promo-message" class="promo-message {% if promo_code %}applied{% endif %}">
+                        {% if promo_code %}"{{ promo_code }}" applied!{% endif %}
+                    </p>
+                </div>
+
+
+                <div class="delivery-box">
+                    <h5 class="delivery-title">Delivery Area</h5>
+                    <label class="delivery-option">
+                        <input type="radio" name="delivery_area_radio" value="dhaka"
+                            data-charge="{{ delivery_settings.dhaka_charge|floatformat:0 }}"
+                            {% if delivery_area == 'dhaka' %}checked{% endif %}>
+                        {{ delivery_settings.dhaka_label }} — ৳{{ delivery_settings.dhaka_charge|floatformat:0 }}
+                    </label>
+                    <label class="delivery-option">
+                        <input type="radio" name="delivery_area_radio" value="outside"
+                            data-charge="{{ delivery_settings.outside_charge|floatformat:0 }}"
+                            {% if delivery_area == 'outside' %}checked{% endif %}>
+                        {{ delivery_settings.outside_label }} — ৳{{ delivery_settings.outside_charge|floatformat:0 }}
+                    </label>
+                </div>
+
+                <div class="price-breakdown">
+                    <div class="pb-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal-cell">৳{{ subtotal }}</span>
+                    </div>
+                    <div id="discount-row" class="pb-row discount-row" style="{% if not discount_amount %}display:none;{% endif %}">
+                        <span>Discount</span>
+                        <span id="discount-cell">− ৳{{ discount_amount }}</span>
+                    </div>
+                    <div class="pb-row">
+                        <span>Delivery Charge</span>
+                        <span id="delivery-cell">৳{{ delivery_charge }}</span>
+                    </div>
+                    <div class="pb-row pb-total">
+                        <span>Total</span>
+                        <span id="final-total-cell">৳{{ final_total }}</span>
+                    </div>
+                </div>
+
+                <button type="submit" form="checkout-form" class="place-order-btn">Place Order</button>
+
+            </div>
+
+        </div>
+
+
+        
+        <!-- Righ: Delivery Form -->
+        <div class="checkout-form-col">
+            <div class="checkout-card">
+                <h4 class="checkout-card-title">Delivery Information</h4>
+                <form method="post" class="delivery-form" id="checkout-form">
+                    <input type="hidden" name="delivery_area" id="delivery-area-input" value="{{ delivery_area }}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Full Name <span class="required-star">*</span></label>
+                        <input type="text" name="full_name" required placeholder="Your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number <span class="required-star">*</span></label>
+                        <input type="text" name="phone" required placeholder="01XXXXXXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Delivery Address <span class="required-star">*</span></label>
+                        <textarea name="address" required rows="2" placeholder="House, road, area, city..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="your@email.com">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+        <!-- Notice: full width, below both -->
+        <div class="checkout-notice">
+            <p><i class="fa-solid fa-triangle-exclamation"></i> Please fill in the required information to confirm your order and click the <strong>"Place Order"</strong> button.</p>
+            <p>Or call directly to place your order: <strong>📞 01518980995</strong></p>
+        </div>
+
+</div>
+
+<script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+const csrftoken = getCookie('csrftoken');
+
+document.getElementById('apply-promo-btn').addEventListener('click', function () {
+    const btn = this;
+    const input = document.getElementById('promo-input');
+    const msg = document.getElementById('promo-message');
+
+    if (btn.textContent.trim() === 'Remove') {
+        fetch("{% url 'shop:remove_promo' %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken },
+        })
+        .then(res => res.json())
+        .then(() => {
+            input.value = '';
+            input.disabled = false;
+            btn.textContent = 'Apply';
+            msg.textContent = '';
+            msg.classList.remove('applied');
+
+            document.getElementById('discount-row').style.display = 'none';
+
+            const subtotal = parseFloat("{{ subtotal }}");
+            const deliveryCharge = parseFloat(document.getElementById('delivery-cell').textContent.replace('৳', ''));
+            const newTotal = subtotal + deliveryCharge;
+            document.getElementById('final-total-cell').textContent = `৳${newTotal.toFixed(0)}`;
+        });
+        return;
+    }
+
+    const code = input.value.trim();
+    if (!code) return;
+
+    fetch("{% url 'shop:apply_promo' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `promo_code=${encodeURIComponent(code)}`,
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            msg.textContent = data.message;
+            msg.classList.add('applied');
+            input.disabled = true;
+            btn.textContent = 'Remove';
+
+            document.getElementById('discount-row').style.display = 'flex';
+            document.getElementById('discount-cell').textContent = `− ৳${parseFloat(data.discount).toFixed(0)}`;
+
+            const deliveryCharge = parseFloat(document.getElementById('delivery-cell').textContent.replace('৳', ''));
+            const newTotal = parseFloat(data.new_total) + deliveryCharge;
+            document.getElementById('final-total-cell').textContent = `৳${newTotal.toFixed(0)}`;
+        } else {
+            msg.textContent = data.message;
+            msg.classList.remove('applied');
+        }
+    });
+});
+
+
+document.querySelectorAll('input[name="delivery_area_radio"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+        const charge = this.dataset.charge;
+        document.getElementById('delivery-cell').textContent = `৳${charge}`;
+        document.getElementById('delivery-area-input').value = this.value;
+
+        const subtotal = parseFloat("{{ subtotal }}");
+        const discount = parseFloat("{{ discount_amount }}");
+        const newTotal = subtotal - discount + parseFloat(charge);
+        document.getElementById('final-total-cell').textContent = `৳${newTotal.toFixed(0)}`;
+
+        fetch("{% url 'shop:set_delivery_area' %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `delivery_area=${this.value}`,
+        });
+    });
+});
+
+
+</script>
+<script>
+fbq('track', 'InitiateCheckout', {
+    value: {{ subtotal }},
+    currency: 'BDT',
+    num_items: {{ cart|length }}
+});
+</script>
+
+
+
+{% endblock %}

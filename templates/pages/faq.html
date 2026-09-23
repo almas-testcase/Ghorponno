@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.faq-item {
+    background: #fff;
+    border: 1px solid #e6ede6;
+    border-radius: 12px;
+    padding: 15px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(63, 114, 175, 0.06);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faq-item:hover {
+    border-color: var(--brand-light-blue);
+    box-shadow: 0 6px 16px rgba(63, 114, 175, 0.10);
+}
+
+.faq-item h4 {
+    color: var(--brand-dark);
+    margin-bottom: 6px;
+}
+
+.faq-item p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+</style>
+
+
+
+<div style="max-width:700px; margin:40px auto; padding:0 20px;">
+    <h2 style="text-align:center; margin-bottom:25px; color:var(--brand-dark);">
+        Frequently Asked Questions
+    </h2>
+
+    <div class="faq-item">
+        <h4>How long does delivery take?</h4>
+        <p>Inside Dhaka: 1-2 business days. Outside Dhaka: 3-5 business days.</p>
+    </div>
+    <div class="faq-item">
+        <h4>What payment methods do you accept?</h4>
+        <p>We currently accept Cash on Delivery. Online payment options are coming soon.</p>
+    </div>
+    <div class="faq-item">
+        <h4>Can I return a product?</h4>
+        <p>Yes, please check our <a href="{% url 'pages:refund_policy' %}">Refund Policy</a> for details.</p>
+    </div>
+    <div class="faq-item">
+        <h4>How can I track my order?</h4>
+        <p>Use the "Track" option in the top menu and enter your phone number.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.cart-page-wrap {
+    max-width: 1100px;
+    margin: 30px auto 60px;
+    padding: 0 40px;
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+.cart-page-title {
+    text-align: center;
+    color: #222;
+    font-size: 24px;
+    margin: 30px 0 20px;
+}
+
+/* ===== Cart Items List ===== */
+.cart-items-col { flex: 2; display: flex; flex-direction: column; gap: 14px; }
+
+.cart-item-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s ease;
+}
+.cart-item-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.07); }
+
+.cart-item-img {
+    width: 72px; height: 72px; flex-shrink: 0;
+    background: #f5f6fa; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.cart-item-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.cart-item-info { flex: 1; min-width: 0; }
+.cart-item-name { font-size: 14.5px; font-weight: 600; color: #222; margin-bottom: 4px; }
+.cart-item-price { font-size: 13px; color: #2e7d32; font-weight: 600; }
+
+.cart-item-qty input {
+    width: 56px;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+.cart-item-qty input::-webkit-inner-spin-button,
+.cart-item-qty input::-webkit-outer-spin-button {
+    opacity: 1;
+    cursor: pointer;
+    margin: 0;
+}
+
+.cart-item-total { min-width: 80px; text-align: right; font-weight: 700; color: #222; font-size: 15px; }
+
+.cart-item-remove {
+    background: #fdeeee; border: none; color: #e53935;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 14px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease;
+}
+.cart-item-remove:hover { background: #f8d4d4; }
+
+/* ===== Order Summary ===== */
+.cart-summary-col { flex: 1; position: sticky; top: 20px; }
+.cart-summary-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+.cart-summary-card h3 {
+    font-size: 16px; color: #222; margin-bottom: 18px;
+    padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+}
+.cart-summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 14px; color: #555; margin-bottom: 12px;
+}
+.cart-summary-total {
+    display: flex; justify-content: space-between;
+    font-size: 17px; font-weight: 700; color: #222;
+    margin: 16px 0 20px; padding-top: 14px; border-top: 1px dashed #ddd;
+}
+.cart-checkout-btn {
+    display: block; width: 100%; text-align: center;
+    background: #2e7d32; color: #fff; padding: 13px; border-radius: 24px;
+    text-decoration: none; font-weight: 600; font-size: 14.5px;
+    transition: background 0.2s ease;
+}
+.cart-checkout-btn:hover { background: #256428; }
+.cart-continue-link {
+    display: block; text-align: center; margin-top: 14px;
+    font-size: 13px; color: #2e7d32; text-decoration: none;
+}
+.cart-continue-link:hover { text-decoration: underline; }
+
+/* ===== Empty Cart ===== */
+.cart-empty {
+    text-align: center;
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 40px 20px;
+}
+.cart-empty-icon { font-size: 56px; margin-bottom: 14px; }
+.cart-empty h3 { font-size: 18px; color: #222; margin-bottom: 8px; }
+.cart-empty p { color: #888; font-size: 14px; margin-bottom: 22px; }
+.cart-shop-btn {
+    display: inline-block; background: #2e7d32; color: #fff;
+    padding: 11px 28px; border-radius: 22px; text-decoration: none; font-weight: 600; font-size: 14px;
+}
+.cart-shop-btn:hover { background: #256428; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .cart-page-wrap { flex-direction: column; padding: 0 20px; }
+    .cart-summary-col { position: static; width: 100%; }
+    .cart-item-card { flex-wrap: wrap; }
+    .cart-item-total { text-align: left; }
+}
+</style>
+
+<h2 class="cart-page-title">🛒 Your Cart</h2>
+
+{% if cart|length > 0 %}
+<div class="cart-page-wrap">
+
+    <div class="cart-items-col" id="cartItemsCol">
+        {% for item in cart %}
+        <div class="cart-item-card" data-product-id="{{ item.product.id }}" data-price="{{ item.price }}">
+            <div class="cart-item-img">
+                {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                {% endif %}
+            </div>
+
+            <div class="cart-item-info">
+                <div class="cart-item-name">{{ item.product.name }}</div>
+                <div class="cart-item-price item-price">৳{{ item.price|floatformat:0 }}</div>
+            </div>
+
+            <div class="cart-item-qty">
+                <input type="number" class="qty-input" value="{{ item.quantity }}" min="1"
+                       data-update-url="{% url 'shop:cart_update' item.product.id %}">
+            </div>
+
+            <div class="cart-item-total item-total">৳{{ item.total_price|floatformat:0 }}</div>
+
+            <form action="{% url 'shop:cart_remove' item.product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="cart-item-remove" aria-label="Remove">✕</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart-summary-col">
+        <div class="cart-summary-card">
+            <h3>Order Summary</h3>
+            <div class="cart-summary-row">
+                <span>Items</span>
+                <span id="cart-item-count">{{ cart|length }}</span>
+            </div>
+            <div class="cart-summary-total">
+                <span>Total</span>
+                <span id="cart-grand-total">৳{{ cart.get_total_price|floatformat:0 }}</span>
+            </div>
+            <a href="{% url 'shop:checkout' %}" class="cart-checkout-btn">Proceed to Checkout</a>
+            <a href="{% url 'shop:home' %}" class="cart-continue-link">← Continue Shopping</a>
+        </div>
+    </div>
+
+</div>
+{% else %}
+    <div class="cart-empty">
+        <div class="cart-empty-icon">🛒</div>
+        <h3>আপনার কার্ট খালি</h3>
+        <p>এখনো কোনো প্রোডাক্ট যোগ করেননি। শপিং শুরু করুন!</p>
+        <a href="{% url 'shop:home' %}" class="cart-shop-btn">Shop Now</a>
+    </div>
+{% endif %}
+
+<script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+const csrftoken = getCookie('csrftoken');
+
+document.querySelectorAll('.qty-input').forEach(input => {
+    let debounceTimer;
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const row = this.closest('.cart-item-card');
+        const price = parseFloat(row.dataset.price);
+        const qty = parseInt(this.value) || 1;
+
+        row.querySelector('.item-total').textContent = `৳${(price * qty).toFixed(0)}`;
+        recalculateGrandTotal();
+
+        debounceTimer = setTimeout(() => {
+            fetch(this.dataset.updateUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `quantity=${qty}`,
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cart-grand-total').textContent = `৳${parseFloat(data.cart_total).toFixed(0)}`;
+                const itemCount = document.getElementById('cart-item-count');
+                if (itemCount) {
+                    itemCount.textContent = data.cart_count;
+                }
+                const floatingCount = document.querySelector('.floating-cart .cart-count');
+                const floatingTotal = document.querySelector('.floating-cart .cart-total');
+                if (floatingCount) floatingCount.textContent = `🛒 ${data.cart_count} items`;
+                if (floatingTotal) floatingTotal.textContent = `৳${Math.round(data.cart_total)}`;
+            });
+        }, 500);
+    });
+});
+
+function recalculateGrandTotal() {
+    let total = 0;
+    document.querySelectorAll('#cartItemsCol .cart-item-card').forEach(row => {
+        const itemTotalText = row.querySelector('.item-total').textContent.replace('৳', '');
+        total += parseFloat(itemTotalText);
+    });
+    document.getElementById('cart-grand-total').textContent = `৳${total.toFixed(0)}`;
+}
+</script>
+{% endblock %}
