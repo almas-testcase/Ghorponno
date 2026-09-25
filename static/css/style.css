@@ -595,6 +595,11 @@ body { font-family: Arial, sans-serif; background: #f9f9f9; color: #222; }
     align-items: start;
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+.footer-logo-img {
+    height: 64px;
+    width: auto;
+    max-width: 220px;
+}
 .footer-col h3 {
     color: #fff;
     font-size: 19px;
@@ -862,7 +867,7 @@ body { font-family: Arial, sans-serif; background: #f9f9f9; color: #222; }
     min-height: 54px;
 }
 .navbar .logo-img {
-    height: 34px;
+    height: 48px;
     width: auto;
 }
 .navbar .search-box {
@@ -887,7 +892,7 @@ body { font-family: Arial, sans-serif; background: #f9f9f9; color: #222; }
         flex: 0 0 auto;
     }
     .navbar .logo-img {
-        height: 26px;
+        height: 34px;
     }
     .navbar .search-box {
         order: 2;
